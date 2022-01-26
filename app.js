@@ -4,8 +4,10 @@ const koaRouter = require('koa-router')
 const app = new koa()
 const router = new koaRouter()
 
-// logger
 
+
+// logger
+/**
 app.use(async (ctx, next) => {
     await next();
     const rt = ctx.response.get('X-Response-Time');
@@ -20,7 +22,15 @@ app.use(async (ctx, next) => {
     const ms = Date.now() - start;
     ctx.set('X-Response-Time', `${ms}ms`);
   });
+ */
+
   
+  //Middleware example
+  router.get('/test', ctx => (ctx.body ="Hello test"));
+
+  //Router middleware
+  app.use(router.routes()).use(router.allowedMethods());
+
   // response
   
   app.use(async ctx => {
