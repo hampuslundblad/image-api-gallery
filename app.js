@@ -1,8 +1,13 @@
-const koa = require('koa')
-const koaRouter = require('koa-router')
+import { getImages } from './api.mjs'
+import koa from 'koa'
+import koaRouter from 'koa-router'
+import fetch from 'node-fetch'
+//const koa = require('koa')
+//const koaRouter = require('koa-router')
 
 const app = new koa()
 const router = new koaRouter()
+
 
 
 
@@ -26,14 +31,20 @@ app.use(async (ctx, next) => {
 
   
   //Middleware example
-  router.get('/test', ctx => (ctx.body ="Hello test"));
+  router.get('/test',async  ctx =>{
+    const images = await getImages()
+    ctx.body={
+      status:200,
+      data:images.photos.photo[0].server
+    }
+  });
 
   //Router middleware
   app.use(router.routes()).use(router.allowedMethods());
 
   // response
-  
+  //getImages().then(data => console.log("https://live.staticflickr.com/" + data.photos.photo[0].server + "/" + data.photos.photo[0].id + "_"+data.photos.photo[0].secret+".jpg"))
   app.use(async ctx => {
-    ctx.body = 'Hello World';
+    ctx.body = "test"
   });
   app.listen(3000);
