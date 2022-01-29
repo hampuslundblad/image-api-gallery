@@ -1,18 +1,11 @@
-import { getImages } from './api.mjs'
+import { getImages } from './flickr_calls.js'
 import koa from 'koa'
 import koaRouter from 'koa-router'
-import fetch from 'node-fetch'
-//const koa = require('koa')
-//const koaRouter = require('koa-router')
 
 const app = new koa()
 const router = new koaRouter()
 
-
-
-
-// logger
-/**
+//Used for logging
 app.use(async (ctx, next) => {
     await next();
     const rt = ctx.response.get('X-Response-Time');
@@ -20,31 +13,25 @@ app.use(async (ctx, next) => {
   });
   
   // x-response-time
-  
   app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
     ctx.set('X-Response-Time', `${ms}ms`);
   });
- */
 
   
   //Middleware example
   router.get('/test',async  ctx =>{
-    const images = await getImages()
+    const images = await getImages() //fetches images from the flickr api
     ctx.body={
       status:200,
-      data:images.photos.photo[0].server
+      data:images
     }
   });
 
   //Router middleware
   app.use(router.routes()).use(router.allowedMethods());
-
-  // response
-  //getImages().then(data => console.log("https://live.staticflickr.com/" + data.photos.photo[0].server + "/" + data.photos.photo[0].id + "_"+data.photos.photo[0].secret+".jpg"))
-  app.use(async ctx => {
-    ctx.body = "test"
-  });
+  
+  app.use(async ctx => (ctx.render("index")))
   app.listen(3000);
