@@ -2,6 +2,7 @@ import { getImages } from './flickr_calls.js'
 import koa from 'koa'
 import koaRouter from 'koa-router'
 
+
 const app = new koa()
 const router = new koaRouter()
 
@@ -21,9 +22,15 @@ app.use(async (ctx, next) => {
   });
 
   
-  //Middleware example
-  router.get('/test',async  ctx =>{
+  //GET
+  router.get('/images',async  ctx =>{
     const images = await getImages() //fetches images from the flickr api
+    console.log(images)
+
+    ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Methods','GET');
+    ctx.set('Content-type', 'application/json');
+
     ctx.body={
       status:200,
       data:images
@@ -31,7 +38,6 @@ app.use(async (ctx, next) => {
   });
 
   //Router middleware
+
   app.use(router.routes()).use(router.allowedMethods());
-  
-  app.use(async ctx => (ctx.render("index")))
   app.listen(3000);
