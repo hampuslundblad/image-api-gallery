@@ -38,15 +38,18 @@ async function fetchWithTimeout(resource, options = {}) {
   return response;
 }
 
-async function getImages() {
+async function getImages(numberOfImages) {
   displayLoading(); // Displays the loading symbol.
   try {
     //Fetches images from our REST api, times out if the request takes longer than 6 seconds
-    let response = await fetchWithTimeout("http://localhost:3000/images", {
-      method: "GET",
-      mode: "cors",
-      timeout: 6000,
-    })
+    let response = await fetchWithTimeout(
+      "http://localhost:3000/images?numberOfImages=" + numberOfImages,
+      {
+        method: "GET",
+        mode: "cors",
+        timeout: 6000,
+      }
+    )
       .then((data) => data.json())
       .then((json) => {
         if (json.status == 500) {
@@ -64,13 +67,13 @@ async function getImages() {
   } catch (error) {
     console.log(error);
     //Timeout if the request takes long than 6 seconds
-    appendErrorTextToGallery(error);
+    appendErrorTextToGallery("Timeout error. " + error);
     return 0;
   }
 }
 
-async function loadImages() {
-  let images = await getImages();
+async function loadImages(numberOfImages = 10) {
+  let images = await getImages(numberOfImages);
   if (images == 0) {
     console.log("Error: images is 0");
   } //If we get 0 as return something went wrong.
@@ -106,15 +109,24 @@ function appendErrorTextToGallery(errorMessage) {
 
 /* Infinite scroll, check if the user has scrolled to the bottom of the page, if so call loadImages. */
 window.addEventListener("scroll", () => {
-  console.log(window.scrollY); //scrolled from top
-  console.log(window.innerHeight); //visible part of screen
+  // console.log(window.scrollY)
+  //   console.log(window.innerHeight)
+  console.log(
+    "True if " +
+      window.scrollY +
+      window.innerHeight +
+      ">=" +
+      document.documentElement.scrollHeight
+  );
   if (
     window.scrollY + window.innerHeight >=
     document.documentElement.scrollHeight
   ) {
-    loadImages();
+    setTimeout(() => {
+      loadImages(10);
+    }, 5000); /* If the user scroll very fast it will result in a timeout error */
   }
 });
 
 /* Load images when user loads the page */
-window.onload = loadImages;
+window.onload = loadImages(50);

@@ -23,7 +23,7 @@ app.use(async (ctx, next) => {
 //GET
 router.get("/images", async (ctx) => {
   try {
-    const images = await getImages(); //fetches images from the flickr api
+    const images = await getImages(ctx.query.numberOfImages); //fetches images from the flickr api
     ctx.body = {
       status: 200,
       data: images,

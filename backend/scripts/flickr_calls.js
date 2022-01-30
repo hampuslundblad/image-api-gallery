@@ -8,8 +8,9 @@ const media = "&media=photos"; // What kind of media we want, videos exists as w
 const jsoncallback = "&nojsoncallback=1"; // We don't want a callback as return.
 const sort = "&sort=relevance";
 
-export async function getImages() {
-  let per_page = "&per_page=" + 50; // Result per page
+export async function getImages(numberOfImages = 10) {
+    console.log(numberOfImages)
+  let per_page = "&per_page=" + numberOfImages; // Result per page
   const response = await fetch(
     "https://api.flickr.com/services/rest/?method=flickr.photos.search" +
       api_key +
@@ -21,5 +22,6 @@ export async function getImages() {
       sort,
     { method: "GET" }
   ).then((data) => data.json());
+  console.log(response)
   return response;
 }
