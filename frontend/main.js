@@ -1,33 +1,104 @@
 //getImages().then(data => console.log("https://live.staticflickr.com/" + data.photos.photo[0].server + "/" + data.photos.photo[0].id + "_"+data.photos.photo[0].secret+".jpg"))
+const gallery = document.getElementById("gallery")
+const loader = document.getElementById("loading")
 
-function formatImageResponse(imageObject){
+function formatImageUrl(imageObject){
     return "https://live.staticflickr.com/" + imageObject.server + "/" + imageObject.id + "_"+imageObject.secret+".jpg"
 }
 
+function displayLoading(){
+    loader.classList.add("display")
+}
+function hideLoading(){
+    loader.classList.remove("display")
+}
+
+//Some as the usual js fetch but times out after 8 seconds unless another value is given.
+async function fetchWithTimeout(resource, options = {}) {
+    const { timeout = 8000 } = options;
+    
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal  
+    });
+    clearTimeout(id);
+  //w  console.log(response)
+    return response;
+  }
+
 async function getImages() {
-    const images = await fetch('http://localhost:3000/images',{method:"GET", mode:"cors"})
+    displayLoading()
+    /*const images = await fetch('http://localhost:3000/images',{method:"GET", mode:"cors"})
         .then(data=>data.json())
         .then(json=>{
-            const imageResponse = json.data.photos.photo
-            return imageResponse
+            if(json.status == 500){ 
+                appendErrorTextToGallery(json.data.error.code)
+                process.exit()
+            }
+            else if(json.status == 200){
+                return json.data.photos.photo
+            }       
+            else{
+                console.error("Something unknown went wrong")
+                process.exit()
+            }
         })
-        return images
+        */
+       try {
+        //Fetches images from our REST api, times out if the request takes longer than 6 seconds
+        let response = await fetchWithTimeout('http://localhost:3000/images',{method:"GET", mode:"cors", timeout:6000}).then(data=>data.json()).then(json=>{
+            if (json.status == 500){
+                appendErrorTextToGallery(json.data.error.code)
+                return 0
+            }
+            else if(json.status == 200){
+                hideLoading() // Hide the loading symbol since request was successfull
+                return json.data.photos.photo
+            }
+            else {
+                console.error("Something unknown went wrong")
+                return 0
+            }
+        })
+        return response
+    }
+       catch (error) {
+           console.log(error)
+            //Timeout if the request takes long than 6 seconds
+            appendErrorTextToGallery(error)
+            return 0
+       }
     }
 
-async function testFunction(){
-        /*await getData().then(image_url=> {
-            console.log(image_url)
-        const gallery = document.getElementById("gallery")
-        const img = document.createElement('img')
-        console.log(image_url)
-        img.src=image_url
-        gallery.append(img) 
-        */
-    const images = await getImages()
-    const image_url = formatImageResponse(images[0])
-    const gallery = document.getElementById("gallery")
+async function loadImages(){
+    let images = await getImages()
+    if(images == 0){
+        console.log("Error: images is 0")
+    }  //If we get 0 as return something went wrong.
+    
+    //Display the images
+    for (let i= 0; i < images.length; i++){
+        const image_url = formatImageUrl(images[i])
+        appendImageToGallery(image_url)
+    }
+}
+
+function appendImageToGallery(image_url){
     const img = document.createElement('img')
-    console.log(image_url)
     img.src=image_url
+    img.className="gallery-image"
     gallery.append(img) 
 }
+function appendErrorTextToGallery(errorMessage){
+    const errorDiv = document.createElement('div')
+    const errorText = document.createTextNode("Something went wrong when trying to access the api\n" + "Error message: " + errorMessage)
+    errorDiv.style.color='red'
+    errorDiv.style.fontSize='2rem'
+    errorDiv.style.textAlign='center'
+    errorDiv.appendChild(errorText)
+    gallery.append(errorDiv)
+}
+
+window.onload = loadImages;

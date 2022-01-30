@@ -24,17 +24,24 @@ app.use(async (ctx, next) => {
   
   //GET
   router.get('/images',async  ctx =>{
-    const images = await getImages() //fetches images from the flickr api
-    console.log(images)
-
+//    ctx.request.socket.setTimeout(5)
+    try {
+      const images = await getImages() //fetches images from the flickr api
+      ctx.body={
+        status:200,
+        data:images
+      }
+    }
+    catch (e){
+      console.log(e)
+      ctx.body={
+        status:500,
+        data:{error:e.code}
+      }
+    }
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Methods','GET');
     ctx.set('Content-type', 'application/json');
-
-    ctx.body={
-      status:200,
-      data:images
-    }
   });
 
   //Router middleware
