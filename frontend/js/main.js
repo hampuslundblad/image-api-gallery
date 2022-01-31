@@ -89,6 +89,7 @@ function appendImageToGallery(image_url) {
   const img = document.createElement("img");
   img.src = image_url;
   img.className = "gallery-image";
+  img.alt="Nature image from Flickr"
   gallery.append(img);
 }
 
@@ -109,21 +110,12 @@ function appendErrorTextToGallery(errorMessage) {
 
 /* Infinite scroll, check if the user has scrolled to the bottom of the page, if so call loadImages. */
 window.addEventListener("scroll", () => {
-  // console.log(window.scrollY)
-  //   console.log(window.innerHeight)
-  console.log(
-    "True if " +
-      window.scrollY +
-      window.innerHeight +
-      ">=" +
-      document.documentElement.scrollHeight
-  );
   if (
     window.scrollY + window.innerHeight >=
     document.documentElement.scrollHeight
   ) {
     setTimeout(() => {
-      loadImages(10);
+      loadImages(20);
     }, 5000); /* If the user scroll very fast it will result in a timeout error */
   }
 });
