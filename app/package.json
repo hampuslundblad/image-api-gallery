@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node backend/scripts/main.js"
+    "client": "http-server ./frontend",
+    "server": "node backend/scripts/main.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/hampuslundblad/cygni-assignment#readme",
   "dependencies": {
+    "http-server": "^14.1.0",
     "koa": "^2.13.4",
     "koa-router": "^10.1.1",
     "node-fetch": "^3.2.0"
