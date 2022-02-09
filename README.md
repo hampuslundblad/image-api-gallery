@@ -1,5 +1,5 @@
 # Cygni-assignment
 
-Starta backend med npm run start
+Starta backend med `npm run server`
 
-Frontend kan köras med exempelvis Live Server i VS Code.
+Frontend startas med `npm run client`
