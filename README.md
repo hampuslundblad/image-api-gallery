@@ -1,4 +1,4 @@
-# Cygni-assignment
+# Simple image gallery using the Flickr API
 
 Starta backend med `npm run server`
 
